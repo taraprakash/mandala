@@ -108,21 +108,6 @@ def findButton(data, x, y):
         
 def keyPressed(event, data):
     # use event.char and event.keysym
-    if data.mode == "startScreen":
-        if event.keysym == "s":
-            data.mode = "gameScreen"
-        elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
-            data.numSlices = int(event.keysym)
-        elif event.keysym == "Right":
-            data.currColor += 1
-            if data.currColor >= len(data.colors):
-                data.currColor = len(data.colors) - 1
-        elif event.keysym == "Left":
-            data.currColor -= 1
-            if data.currColor < 0:
-                data.currColor = 0
-    elif data.mode == "gameScreendef keyPressed(event, data):
-    # use event.char and event.keysym
     
     #on start screen!
     if data.mode == "startScreen":
@@ -156,12 +141,6 @@ def keyPressed(event, data):
             
     #on game screen!
     elif data.mode == "gameScreen":
-        if event.keysym == "b":
-            init(data)
-        elif event.keysym == "u" and len(data.lines) > 0:
-            data.undoLst.append(data.lines.pop())
-        elif event.keysym == "r" and len(data.undoLst) > 0:
-            data.lines.append(data.undoLst.pop())":
         if event.keysym == "b":
             init(data)
         elif event.keysym == "u" and len(data.lines) > 0:
