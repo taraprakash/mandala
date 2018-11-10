@@ -73,11 +73,6 @@ def init(data):
     data.save = getButtonCoordinates(data, 2)
     data.restart = getButtonCoordinates(data,3)
     
-def save(data):
-    if __name__ == "__main__":
-        im=ImageGrab.grab(bbox=(data.rootX+data.XMargin,data.rootY+data.YTopMargin,data.rootX+data.width-data.XMargin,data.rootY+data.height-data.YBottomMargin))
-        im.save("mandala.jpg")
-        
 def getButtonCoordinates(data, button):
     buttonHeight = (60/510)*data.height
     buttonWidth = (100/580)*data.width
@@ -87,15 +82,20 @@ def getButtonCoordinates(data, button):
     newX = startingX + buttonWidth
     newY = startingY + buttonHeight
     return [(startingX, startingY), (newX, newY)]
-    
+
 def getLabelCoordinates(buttonCoordinates):
     cx = (buttonCoordinates[0][0] + buttonCoordinates[1][0])//2
     cy = (buttonCoordinates[0][1] + buttonCoordinates[1][1])//2
     return (cx, cy)
-  
+
+def save(data):
+    if __name__ == "__main__":
+        im=ImageGrab.grab(bbox=(data.rootX+data.XLeftMargin,data.rootY+data.YTopMargin,data.rootX+data.width-data.XLeftMargin,data.rootY+data.height-data.YBottomMargin))
+        im.save("mandala.jpg")
+
 def mousePressHeldDown(event, data):
     # use event.x and event.y
-    if data.mode == "gameScreen" and event.x>data.XMargin and event.x<data.width-data.XMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
+    if data.mode == "gameScreen" and event.x>data.XLeftMargin and event.x<data.width-data.XRightMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
         if data.limit < data.maxLimit:
             r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
             data.currLine.append((r, offset))
@@ -111,37 +111,38 @@ def mousePressReleased(event, data):
         commitCurrLine(data)
 
 def mousePressed(event, data):
-    x = event.x
-    y = event.y
-    button = findButton(data, event.x, event.y)
-    if button != None:
-        if button == "undo":
-            pass
-        
+    if data.mode == "gameScreen":
+        x = event.x
+        y = event.y
+        button = findButton(data, event.x, event.y)
+        print(button)
+        if button != None:
+            if button == "undo" and len(data.lines) > 0:
+                data.undoLst.append(data.lines.pop())
+            elif button == "redo" and len(data.undoLst) > 0:
+                print("hi")
+                data.lines.append(data.undoLst.pop())
+            elif button == "save":
+                save(data)
+            elif button == "restart":
+                init(data)
     
 def findButton(data, x, y):
     for button in [data.undo, data.redo, data.save, data.restart]:
-        x0, y0, x1, y1 = button
+        x0, y0 = button[0]
+        x1, y1 = button[1]
         if x0 <= x <= x1 and y0 <= y <= y1:
-            return str(button)[5:]
+            if button == data.undo:
+                return "undo"
+            elif button == data.redo:
+                return "redo"
+            elif button == data.save:
+                return "save"
+            elif button == data.restart:
+                return "restart"
     return None
-        
+
 def keyPressed(event, data):
-    # use event.char and event.keysym
-    if data.mode == "startScreen":
-        if event.keysym == "s":
-            data.mode = "gameScreen"
-        elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
-            data.numSlices = int(event.keysym)
-        elif event.keysym == "Right":
-            data.currColor += 1
-            if data.currColor >= len(data.colors):
-                data.currColor = len(data.colors) - 1
-        elif event.keysym == "Left":
-            data.currColor -= 1
-            if data.currColor < 0:
-                data.currColor = 0
-    elif data.mode == "gameScreendef keyPressed(event, data):
     # use event.char and event.keysym
     
     #on start screen!
@@ -173,26 +174,10 @@ def keyPressed(event, data):
             data.mode = "gameScreen"
         elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
             data.numSlices = int(event.keysym)
-            
-    #on game screen!
-    elif data.mode == "gameScreen":
-        if event.keysym == "b":
-            init(data)
-        elif event.keysym == "u" and len(data.lines) > 0:
-            data.undoLst.append(data.lines.pop())
-        elif event.keysym == "r" and len(data.undoLst) > 0:
-            data.lines.append(data.undoLst.pop())":
-        if event.keysym == "b":
-            init(data)
-        elif event.keysym == "u" and len(data.lines) > 0:
-            data.undoLst.append(data.lines.pop())
-        elif event.keysym == "r" and len(data.undoLst) > 0:
-            data.lines.append(data.undoLst.pop())
-    
  
 def drawProgress(canvas,data):
-    startX=(data.XMargin*6)
-    barLen=data.width-data.XMargin-startX
+    startX=(data.XLeftMargin*6)
+    barLen=data.width-data.XLeftMargin-startX
     barThick=data.YBottomMargin//2
     if data.limit<=100:
         lim=data.limit
@@ -203,12 +188,12 @@ def drawProgress(canvas,data):
     progLen=barLen*(lim/100)
     startY=data.height-((barThick/2)*3)
     endY=data.height-(barThick/2)
-    canvas.create_rectangle(startX, startY, data.width-data.XMargin, endY, fill="white", width=2)
+    canvas.create_rectangle(startX, startY, data.width-data.XLeftMargin, endY, fill="white", width=2)
     if done:
-        canvas.create_text(data.XMargin*2, startY, text="Done!", anchor=NW, fill="black", font=data.font)
+        canvas.create_text(data.XLeftMargin*2, startY, text="Done!", anchor=NW, fill="black", font=data.font)
         canvas.create_rectangle(startX, startY, startX+progLen, endY, fill="gray20")
     else:
-        canvas.create_text(data.XMargin, startY, text="Progress:", anchor=NW, fill="black", font=data.font)
+        canvas.create_text(data.XLeftMargin, startY, text="Progress:", anchor=NW, fill="black", font=data.font)
         canvas.create_rectangle(startX, startY, startX+progLen, endY, fill="gray47")
         
 def drawGameScreen(canvas, data):
@@ -319,8 +304,6 @@ def commitCurrLine(data):
         tempLine = convertCurrLine(data)
         data.lines.append(tempLine)
         data.currLine = []
-    if len(data.undoLst) != 0:
-        data.undoLst = []
 
 #converts current line to six lines with tuple values listing x and y values
 def convertCurrLine(data):
@@ -351,7 +334,7 @@ def convertToCartesian(cx, cy, r, theta):
 # use the run function as-is
 ####################################
 
-def run(width=440, height=510):
+def run(width=580, height=510):
     def redrawAllWrapper(canvas, data):
         canvas.delete(ALL)
         canvas.create_rectangle(0, 0, data.width, data.height,
