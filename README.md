@@ -131,11 +131,11 @@ def drawProgress(canvas,data):
 def drawGameScreen(canvas, data):
     for lineLst in data.lines:
         for line in lineLst:
-            canvas.create_line(line, width = 2, smooth="true")
+            canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
     if len(data.currLine) >= 2:
         tempLineLst = convertCurrLine(data)
         for line in tempLineLst:
-            canvas.create_line(line, width = 2, smooth="true")
+            canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
     canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(0,0,data.XMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(data.width-data.XMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
