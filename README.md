@@ -70,11 +70,11 @@ def redrawAll(canvas, data):
     # draw in canvas
     for lineLst in data.lines:
         for line in lineLst:
-            canvas.create_line(line, smooth="true")
+            canvas.create_line(line, width = 2, smooth="true")
     if len(data.currLine) >= 2:
         tempLineLst = convertCurrLine(data)
         for line in tempLineLst:
-            canvas.create_line(line, smooth="true")
+            canvas.create_line(line, width = 2, smooth="true")
 
 #commits the current line to the entire data.lines 3d list
 def commitCurrLine(data):
