@@ -54,7 +54,7 @@ def init(data):
     data.YBottomMargin=20
     data.XMargin=20
     data.cx = data.width/2
-    data.cy = data.height/2
+    data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
     data.font="bold15"
 
@@ -138,7 +138,7 @@ def convertToCartesian(cx, cy, r, theta):
 # use the run function as-is
 ####################################
 
-def run(width=300, height=300):
+def run(width=440, height=490):
     def redrawAllWrapper(canvas, data):
         canvas.delete(ALL)
         canvas.create_rectangle(0, 0, data.width, data.height,
@@ -182,4 +182,4 @@ def run(width=300, height=300):
     root.mainloop()  # blocks until window is closed
     print("bye!")
 
-run(400, 400)
+run(440, 490)
