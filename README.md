@@ -123,11 +123,11 @@ def redrawAll(canvas, data):
 
 #commits the current line to the entire data.lines 3d list
 def commitCurrLine(data):
-    #if len(data.currLine) >= 2?
-    dA = 2*math.pi/data.numSlices
-    tempLine = convertCurrLine(data)
-    data.lines.append(tempLine)
-    data.currLine = []
+    if len(data.currLine) >= 2:
+        dA = 2*math.pi/data.numSlices
+        tempLine = convertCurrLine(data)
+        data.lines.append(tempLine)
+        data.currLine = []
 
 #converts current line to six lines with tuple values listing x and y values
 def convertCurrLine(data):
