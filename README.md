@@ -84,7 +84,7 @@ def getLabelCoordinates(buttonCoordinates):
 
 def save(data):
     if __name__ == "__main__":
-        im=ImageGrab.grab(bbox=(data.rootX+data.XLeftMargin,data.rootY+data.YTopMargin,data.rootX+data.width-data.XLeftMargin,data.rootY+data.height-data.YBottomMargin))
+        im=ImageGrab.grab(bbox=(data.rootX+data.XLeftMargin,data.rootY+data.YTopMargin,data.rootX+data.width-data.XRightMargin,data.rootY+data.height-data.YBottomMargin))
         im.save("mandala.jpg")
 
 def mousePressHeldDown(event, data):
@@ -337,6 +337,7 @@ def run(width=580, height=510):
         canvas.update()    
 
     def mousePressedWrapper(event, canvas, data):
+        something()
         mousePressed(event, data)
         redrawAllWrapper(canvas, data)
 
@@ -369,6 +370,7 @@ def run(width=580, height=510):
     def something():
         data.rootX = canvas.winfo_rootx()
         data.rootY = canvas.winfo_rooty()
+        print(data.rootX, data.rootY)
     root.after(200, something)
     # set up events
     root.bind("<Button-1>", lambda event:
@@ -383,3 +385,5 @@ def run(width=580, height=510):
     # and launch the app
     root.mainloop()  # blocks until window is closed
     print("bye!")
+
+run()
