@@ -65,6 +65,9 @@ def init(data):
     data.mode = "startScreen"
     data.colors = ["black", "red4", "pale violet red", "sea green", "DeepSkyBlue4"]
     data.currColor = 0
+    data.backgroundColors = ["white", "black"]
+    data.currBackgroundColor = 0
+    data.picking = "background" #can either be background or line
 
 def mousePressed(event, data):
     # use event.x and event.y
@@ -98,7 +101,47 @@ def keyPressed(event, data):
             data.currColor -= 1
             if data.currColor < 0:
                 data.currColor = 0
+    elif data.mode == "gameScreendef keyPressed(event, data):
+    # use event.char and event.keysym
+    
+    #on start screen!
+    if data.mode == "startScreen":
+        if data.picking == "background":
+            if event.keysym == "Down":
+                data.picking = "line"
+            elif event.keysym == "Left":
+                data.currBackgroundColor -= 1
+                if data.currBackgroundColor < 0:
+                    data.currBackgroundColor = 0
+            elif event.keysym == "Right":
+                data.currBackgroundColor += 1
+                if data.currBackgroundColor >= len(data.backgroundColors):
+                    data.currBackgroundColor = len(data.backgroundColors) - 1
+                print(data.currBackgroundColor)
+        else:
+            if event.keysym == "Up":
+                data.picking = "background"
+            elif event.keysym == "Right":
+                data.currColor += 1
+                if data.currColor >= len(data.colors):
+                    data.currColor = len(data.colors) - 1
+            elif event.keysym == "Left":
+                data.currColor -= 1
+                if data.currColor < 0:
+                    data.currColor = 0
+        if event.keysym == "s":
+            data.mode = "gameScreen"
+        elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
+            data.numSlices = int(event.keysym)
+            
+    #on game screen!
     elif data.mode == "gameScreen":
+        if event.keysym == "b":
+            init(data)
+        elif event.keysym == "u" and len(data.lines) > 0:
+            data.undoLst.append(data.lines.pop())
+        elif event.keysym == "r" and len(data.undoLst) > 0:
+            data.lines.append(data.undoLst.pop())":
         if event.keysym == "b":
             init(data)
         elif event.keysym == "u" and len(data.lines) > 0:
@@ -129,6 +172,7 @@ def drawProgress(canvas,data):
         canvas.create_rectangle(startX, startY, startX+progLen, endY, fill="gray47")
         
 def drawGameScreen(canvas, data):
+    canvas.create_rectangle(0, 0, data.width, data.height, fill = data.backgroundColors[data.currBackgroundColor])
     for lineLst in data.lines:
         for line in lineLst:
             canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
@@ -159,21 +203,41 @@ def drawStartScreen(canvas, data):
                             2 * data.width//3 + 20, data.cy + 20,
                             fill = "white")
     canvas.create_text(2 * data.width//3, data.cy, text = str(data.numSlices), font = "Times 20")
-    canvas.create_text(data.cx, data.height - 45, text = "Press s to start!", font = "Times 20")
-    canvas.create_text(data.width//4, data.height - 110, text = "Use arrow keys \n to pick a color", font = "Times 15")
-    barWidth = 200
-    canvas.create_rectangle(data.cx, data.height - 130, 
-                            data.cx + barWidth, data.height - 80)
-    blockWidth = barWidth // len(data.colors)
+    canvas.create_text(data.cx, data.height - 30, text = "Press s to start!", font = "Times 20")
+    canvas.create_text(data.width//4 + 20, data.height - 160, text = "Use arrow keys to pick colors", font = "Times 15")
+    
+    #picking line color
+    lineBarWidth = 200
+    blockWidth = lineBarWidth // len(data.colors)
     for i in range(len(data.colors)):
         color = data.colors[i]
-        print(color)
-        canvas.create_rectangle(data.cx + blockWidth * i, data.height - 130, 
-                            data.cx + blockWidth * (i + 1), data.height - 80, fill = color)
-    print(data.currColor)
-    canvas.create_rectangle(data.cx + data.currColor * blockWidth, data.height - 130,
-                            data.cx + blockWidth * (data.currColor + 1), data.height - 80, width = 5, fill = None)
-                            
+        canvas.create_rectangle(data.cx + blockWidth * i, data.height - 100, 
+                            data.cx + blockWidth * (i + 1), data.height - 70, fill = color)
+    canvas.create_rectangle(data.cx + data.currColor * blockWidth, data.height - 100,
+                            data.cx + blockWidth * (data.currColor + 1), data.height -                      
+                            70, width = 5, fill = None)
+    
+    #picking background color
+    backgroundBarWidth = 50
+    blockWidth = backgroundBarWidth // len(data.backgroundColors)
+    for i in range(len(data.backgroundColors)):
+        color = data.backgroundColors[i]
+        canvas.create_rectangle(data.cx + blockWidth * i, data.height - 145,
+                                data.cx + blockWidth * (i + 1), data.height - 115,
+                                fill = color)
+    canvas.create_rectangle(data.cx + data.currBackgroundColor * blockWidth, data.height - 145,
+                            data.cx + (data.currBackgroundColor + 1) * blockWidth, data.height-115,
+                            width = 5, fill = None)
+    
+    
+    if data.picking == "background":
+        backgroundFont = "Times 15 bold underline"
+        lineFont = "Times 15"
+    else:
+        backgroundFont = "Times 15"
+        lineFont = "Times 15 bold underline"
+    canvas.create_text(data.width//4, data.height - 130, text = "background:", font = backgroundFont)
+    canvas.create_text(data.width//4, data.height - 85, text = "lines:", font = lineFont)
     
 def redrawAll(canvas, data):
     # draw in canvas
