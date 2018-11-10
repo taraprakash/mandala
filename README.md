@@ -50,6 +50,7 @@ def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
     data.currLine = [] #1D list containing tuples
+    data.undoLst = []
     data.YTopMargin=70
     data.YBottomMargin=20
     data.XMargin=20
@@ -85,8 +86,13 @@ def keyPressed(event, data):
             data.mode = "gameScreen"
         elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
             data.numSlices = int(event.keysym)
-    elif data.mode == "gameScreen" and event.keysym == "r":
-        init(data)
+    elif data.mode == "gameScreen":
+        if event.keysym == "s":
+            init(data)
+        elif event.keysym == "u" and len(data.lines) > 0:
+            data.undoLst.append(data.lines.pop())
+        elif event.keysym == "r" and len(data.undoLst) > 0:
+            data.lines.append(data.undoLst.pop())
     
 def drawGameScreen(canvas, data):
     for lineLst in data.lines:
@@ -105,8 +111,7 @@ def drawGameScreen(canvas, data):
     canvas.create_line(data.XMargin, data.YTopMargin, data.width-data.XMargin, data.YTopMargin, width=2)
     canvas.create_line(data.XMargin, data.height-data.YBottomMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
-    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to redo, press \"b\" to restart", font=data.font)
-    
+    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
     
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
@@ -135,6 +140,8 @@ def commitCurrLine(data):
         tempLine = convertCurrLine(data)
         data.lines.append(tempLine)
         data.currLine = []
+    if len(data.undoLst) != 0:
+        data.undoLst = []
 
 #converts current line to six lines with tuple values listing x and y values
 def convertCurrLine(data):
@@ -155,6 +162,7 @@ def convertCurrLine(data):
         tempLine.append(line2)
     return tempLine #2D list of lists of tuples with points of a line
 
+#converts polar coordinates to cartesian
 def convertToCartesian(cx, cy, r, theta):
     x = cx + r*math.cos(theta)
     y = cy - r*math.sin(theta)
