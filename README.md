@@ -224,7 +224,7 @@ def convertToCartesian(cx, cy, r, theta):
 # use the run function as-is
 ####################################
 
-def run(width=440, height=490):
+def run(width=440, height=510):
     def redrawAllWrapper(canvas, data):
         canvas.delete(ALL)
         canvas.create_rectangle(0, 0, data.width, data.height,
