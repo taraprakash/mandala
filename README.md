@@ -59,7 +59,7 @@ def init(data):
     data.font="bold15"
     data.maxLimit = 100
     data.limit = 0
-    data.mode == "startScreen"
+    data.mode = "startScreen"
 
 def mousePressed(event, data):
     # use event.x and event.y
