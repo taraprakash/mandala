@@ -11,32 +11,26 @@ def getPolarCoordinates(cx, cy, n, x, y):
     dx = cx - x
     dy = cy -y
     deltaTheta = 2 * math.pi / n
-    quadrant = getQuadrant(cx, cy, x, y)
     if dx == 0:
         r = dy
-        if quadrant == 1:
+        if dy > 0:
             theta = math.pi / 2
         else:
             theta = 3 * math.pi / 2
     else:
         angle = math.atan(dy / dx)
-        bigTheta = quadrant * math.pi / 2 + angle
+        if dx < 0:
+            bigTheta = math.pi - angle
+        elif angle > 0:
+            bigTheta = angle
+        else: #angle less than zero
+            bigTheta = math.pi*2 + angle
         pieSlice = getPieSlice(bigTheta, n)
         pieSliceTheta = deltaTheta * pieSlice
         theta = bigTheta - pieSliceTheta
         r = (dx ** 2 + dy**2) ** 0.5
     return (r, theta)
 
-def getQuadrant(cx, cy, x, y):
-    if x > cx:
-        if y > cy:
-            return 3
-        return 0
-    else:
-        if y > cy:
-            return 2
-        return 1
-        
 def getPieSlice(theta, numSlices):
     dA=2*math.pi/numSlices
     slice=theta//dA
