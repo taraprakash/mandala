@@ -57,7 +57,8 @@ def init(data):
     data.cx = data.width/2
     data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
-    data.font="bold15"
+    data.fontSize=(15/70)*data.YTopMargin
+    data.font="bold "+str(int(data.fontSize))
     data.maxLimit = 100
     data.limit = 0
     data.mode = "startScreen"
