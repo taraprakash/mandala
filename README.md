@@ -6,6 +6,19 @@ highLevel
 from tkinter import *
 
 ####################################
+def getPieSlice(theta, numSlices):
+    dAngle=360/numSlices
+    minDist=361
+    minSlice=-1
+    for i in range(numSlices):
+        angle=dAngle*i
+        distance=angle-theta
+        if distance<minDist:
+            minDist=distance
+            minSlice=i
+    return minSlice
+
+####################################
 # customize these functions
 ####################################
 
