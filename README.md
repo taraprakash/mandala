@@ -50,9 +50,9 @@ def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
     data.currLine = [] #1D list containing tuples
-    data.YTopMargin=70
-    data.YBottomMargin=20
-    data.XMargin=20
+    data.YTopMargin=(70/490)*data.height
+    data.YBottomMargin=(20/490)*data.height
+    data.XMargin=(20/440)*data.width
     data.cx = data.width/2
     data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
@@ -86,6 +86,13 @@ def keyPressed(event, data):
         init(data)
     
 def drawGameScreen(canvas, data):
+    for lineLst in data.lines:
+        for line in lineLst:
+            canvas.create_line(line, width=2, smooth="true")
+    if len(data.currLine) >= 2:
+        tempLineLst = convertCurrLine(data)
+        for line in tempLineLst:
+            canvas.create_line(line, width=2, smooth="true")
     canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(0,0,data.XMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(data.width-data.XMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
@@ -96,14 +103,6 @@ def drawGameScreen(canvas, data):
     canvas.create_line(data.XMargin, data.height-data.YBottomMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
     canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
-    
-    for lineLst in data.lines:
-        for line in lineLst:
-            canvas.create_line(line, width = 2, smooth="true")
-    if len(data.currLine) >= 2:
-        tempLineLst = convertCurrLine(data)
-        for line in tempLineLst:
-            canvas.create_line(line, width = 2, smooth="true")
     
 def drawStartScreen(data, canvas):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
