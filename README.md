@@ -50,18 +50,18 @@ def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
     data.currLine = [] #1D list containing tuples
-    data.undoLst = []
     data.YTopMargin=70
     data.YBottomMargin=20
     data.XMargin=20
     data.cx = data.width/2
     data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
-    data.fontSize=(15/70)*data.YTopMargin
-    data.font="bold "+str(int(data.fontSize))
+    data.font="bold15"
     data.maxLimit = 100
     data.limit = 0
     data.mode = "startScreen"
+    data.colors = ["black", "red4", "pale violet red", "sea green", "DeepSkyBlue4"]
+    data.currColor = 0
 
 def mousePressed(event, data):
     # use event.x and event.y
@@ -87,6 +87,14 @@ def keyPressed(event, data):
             data.mode = "gameScreen"
         elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
             data.numSlices = int(event.keysym)
+        elif event.keysym == "Right":
+            data.currColor += 1
+            if data.currColor >= len(data.colors):
+                data.currColor = len(data.colors) - 1
+        elif event.keysym == "Left":
+            data.currColor -= 1
+            if data.currColor < 0:
+                data.currColor = 0
     elif data.mode == "gameScreen":
         if event.keysym == "b":
             init(data)
@@ -148,8 +156,28 @@ def drawStartScreen(canvas, data):
                             2 * data.width//3 + 20, data.cy + 20,
                             fill = "white")
     canvas.create_text(2 * data.width//3, data.cy, text = str(data.numSlices), font = "Times 20")
-    canvas.create_text(data.cx, data.height - 100, text = "press s to start!", font = "Times 30")
+    canvas.create_text(data.cx, data.height - 45, text = "Press s to start!", font = "Times 20")
+    canvas.create_text(data.width//4, data.height - 110, text = "Use arrow keys \n to pick a color", font = "Times 15")
+    barWidth = 200
+    canvas.create_rectangle(data.cx, data.height - 130, 
+                            data.cx + barWidth, data.height - 80)
+    blockWidth = barWidth // len(data.colors)
+    for i in range(len(data.colors)):
+        color = data.colors[i]
+        print(color)
+        canvas.create_rectangle(data.cx + blockWidth * i, data.height - 130, 
+                            data.cx + blockWidth * (i + 1), data.height - 80, fill = color)
+    print(data.currColor)
+    canvas.create_rectangle(data.cx + data.currColor * blockWidth, data.height - 130,
+                            data.cx + blockWidth * (data.currColor + 1), data.height - 80, width = 5, fill = None)
+                            
     
+def redrawAll(canvas, data):
+    # draw in canvas
+    if data.mode == "gameScreen":
+        drawGameScreen(canvas, data)
+    elif data.mode == "startScreen":
+        drawStartScreen(canvas, data)
 def redrawAll(canvas, data):
     # draw in canvas
     if data.mode == "gameScreen":
