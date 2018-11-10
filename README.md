@@ -1,9 +1,27 @@
-# mandala by highLevel
+#import module_manager
+#module_manager.review()
 
-# Basic Animation Framework
+#from PIL import Image
 
+import math 
 from tkinter import *
-import math
+import pyscreenshot as ImageGrab
+from PIL import Image
+ 
+'''# fullscreen
+im=ImageGrab.grab()
+im.show()'''
+ 
+'''# part of the screen
+im=ImageGrab.grab(bbox=(10,10,500,500))
+im.show()
+ 
+# to file
+ImageGrab.grab_to_file('im.png')'''
+    
+def getBitches():
+    print("Nah, bitches be cray")
+
 
 
 ####################################
@@ -36,7 +54,7 @@ def getQuadrant(cx, cy, x, y):
         if y > cy:
             return 2
         return 1
-        
+
 def getPieSlice(theta, numSlices):
     dA=2*math.pi/numSlices
     slice=theta//dA
@@ -46,7 +64,6 @@ def getPieSlice(theta, numSlices):
 # customize these functions
 ####################################
 
-    
 def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
@@ -65,9 +82,14 @@ def init(data):
     data.mode = "startScreen"
     data.colors = ["black", "red4", "pale violet red", "sea green", "DeepSkyBlue4"]
     data.currColor = 0
-    data.backgroundColors = ["white", "black"]
-    data.currBackgroundColor = 0
-    data.picking = "background" #can either be background or line
+    
+    
+'''def save(data):
+    data.im.show()
+    ImageGrab.grab_to_file('im.png')'''
+
+def save(data):
+    data.im=ImageGrab.grab(bbox=(data.XMargin,data.YTopMargin,data.width-data.XMargin,data.height-data.YBottomMargin))
 
 def mousePressed(event, data):
     # use event.x and event.y
@@ -101,55 +123,17 @@ def keyPressed(event, data):
             data.currColor -= 1
             if data.currColor < 0:
                 data.currColor = 0
-    elif data.mode == "gameScreendef keyPressed(event, data):
-    # use event.char and event.keysym
-    
-    #on start screen!
-    if data.mode == "startScreen":
-        if data.picking == "background":
-            if event.keysym == "Down":
-                data.picking = "line"
-            elif event.keysym == "Left":
-                data.currBackgroundColor -= 1
-                if data.currBackgroundColor < 0:
-                    data.currBackgroundColor = 0
-            elif event.keysym == "Right":
-                data.currBackgroundColor += 1
-                if data.currBackgroundColor >= len(data.backgroundColors):
-                    data.currBackgroundColor = len(data.backgroundColors) - 1
-                print(data.currBackgroundColor)
-        else:
-            if event.keysym == "Up":
-                data.picking = "background"
-            elif event.keysym == "Right":
-                data.currColor += 1
-                if data.currColor >= len(data.colors):
-                    data.currColor = len(data.colors) - 1
-            elif event.keysym == "Left":
-                data.currColor -= 1
-                if data.currColor < 0:
-                    data.currColor = 0
-        if event.keysym == "s":
-            data.mode = "gameScreen"
-        elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
-            data.numSlices = int(event.keysym)
-            
-    #on game screen!
     elif data.mode == "gameScreen":
         if event.keysym == "b":
             init(data)
         elif event.keysym == "u" and len(data.lines) > 0:
             data.undoLst.append(data.lines.pop())
         elif event.keysym == "r" and len(data.undoLst) > 0:
-            data.lines.append(data.undoLst.pop())":
-        if event.keysym == "b":
-            init(data)
-        elif event.keysym == "u" and len(data.lines) > 0:
-            data.undoLst.append(data.lines.pop())
-        elif event.keysym == "r" and len(data.undoLst) > 0:
             data.lines.append(data.undoLst.pop())
+        elif event.keysym == "c":
+            save(data)
     
- 
+    
 def drawProgress(canvas,data):
     startX=(data.XMargin*6)
     barLen=data.width-data.XMargin-startX
@@ -170,16 +154,15 @@ def drawProgress(canvas,data):
     else:
         canvas.create_text(data.XMargin, startY, text="Progress:", anchor=NW, fill="black", font=data.font)
         canvas.create_rectangle(startX, startY, startX+progLen, endY, fill="gray47")
-        
+
 def drawGameScreen(canvas, data):
-    canvas.create_rectangle(0, 0, data.width, data.height, fill = data.backgroundColors[data.currBackgroundColor])
     for lineLst in data.lines:
         for line in lineLst:
-            canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
+            canvas.create_line(line, fill = data.colors[data.currColor], width=2, smooth="true")
     if len(data.currLine) >= 2:
         tempLineLst = convertCurrLine(data)
         for line in tempLineLst:
-            canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
+            canvas.create_line(line, fill = data.colors[data.currColor], width=2, smooth="true")
     canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(0,0,data.XMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(data.width-data.XMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
@@ -191,7 +174,8 @@ def drawGameScreen(canvas, data):
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
     canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to redo, press \"b\" to restart", font=data.font)
     drawProgress(canvas, data)
-    
+
+
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
     canvas.create_text(data.cx, data.height//4, text = "Let\'s Make A \n   Mandala!",
@@ -203,48 +187,21 @@ def drawStartScreen(canvas, data):
                             2 * data.width//3 + 20, data.cy + 20,
                             fill = "white")
     canvas.create_text(2 * data.width//3, data.cy, text = str(data.numSlices), font = "Times 20")
-    canvas.create_text(data.cx, data.height - 30, text = "Press s to start!", font = "Times 20")
-    canvas.create_text(data.width//4 + 20, data.height - 160, text = "Use arrow keys to pick colors", font = "Times 15")
-    
-    #picking line color
-    lineBarWidth = 200
-    blockWidth = lineBarWidth // len(data.colors)
+    canvas.create_text(data.cx, data.height - 45, text = "Press s to start!", font = "Times 20")
+    canvas.create_text(data.width//4, data.height - 110, text = "Use arrow keys \n to pick a color", font = "Times 15")
+    barWidth = 200
+    canvas.create_rectangle(data.cx, data.height - 130, 
+                            data.cx + barWidth, data.height - 80)
+    blockWidth = barWidth // len(data.colors)
     for i in range(len(data.colors)):
         color = data.colors[i]
-        canvas.create_rectangle(data.cx + blockWidth * i, data.height - 100, 
-                            data.cx + blockWidth * (i + 1), data.height - 70, fill = color)
-    canvas.create_rectangle(data.cx + data.currColor * blockWidth, data.height - 100,
-                            data.cx + blockWidth * (data.currColor + 1), data.height -                      
-                            70, width = 5, fill = None)
+        print(color)
+        canvas.create_rectangle(data.cx + blockWidth * i, data.height - 130, 
+                            data.cx + blockWidth * (i + 1), data.height - 80, fill = color)
+    print(data.currColor)
+    canvas.create_rectangle(data.cx + data.currColor * blockWidth, data.height - 130,
+                            data.cx + blockWidth * (data.currColor + 1), data.height - 80, width = 5, fill = None)
     
-    #picking background color
-    backgroundBarWidth = 50
-    blockWidth = backgroundBarWidth // len(data.backgroundColors)
-    for i in range(len(data.backgroundColors)):
-        color = data.backgroundColors[i]
-        canvas.create_rectangle(data.cx + blockWidth * i, data.height - 145,
-                                data.cx + blockWidth * (i + 1), data.height - 115,
-                                fill = color)
-    canvas.create_rectangle(data.cx + data.currBackgroundColor * blockWidth, data.height - 145,
-                            data.cx + (data.currBackgroundColor + 1) * blockWidth, data.height-115,
-                            width = 5, fill = None)
-    
-    
-    if data.picking == "background":
-        backgroundFont = "Times 15 bold underline"
-        lineFont = "Times 15"
-    else:
-        backgroundFont = "Times 15"
-        lineFont = "Times 15 bold underline"
-    canvas.create_text(data.width//4, data.height - 130, text = "background:", font = backgroundFont)
-    canvas.create_text(data.width//4, data.height - 85, text = "lines:", font = lineFont)
-    
-def redrawAll(canvas, data):
-    # draw in canvas
-    if data.mode == "gameScreen":
-        drawGameScreen(canvas, data)
-    elif data.mode == "startScreen":
-        drawStartScreen(canvas, data)
 def redrawAll(canvas, data):
     # draw in canvas
     if data.mode == "gameScreen":
@@ -259,8 +216,6 @@ def commitCurrLine(data):
         tempLine = convertCurrLine(data)
         data.lines.append(tempLine)
         data.currLine = []
-    if len(data.undoLst) != 0:
-        data.undoLst = []
 
 #converts current line to six lines with tuple values listing x and y values
 def convertCurrLine(data):
@@ -281,7 +236,6 @@ def convertCurrLine(data):
         tempLine.append(line2)
     return tempLine #2D list of lists of tuples with points of a line
 
-#converts polar coordinates to cartesian
 def convertToCartesian(cx, cy, r, theta):
     x = cx + r*math.cos(theta)
     y = cy - r*math.sin(theta)
@@ -302,7 +256,7 @@ def run(width=440, height=510):
     def mousePressedWrapper(event, canvas, data):
         mousePressed(event, data)
         redrawAllWrapper(canvas, data)
-    
+
     def mousePressReleasedWrapper(event, canvas, data):
         mousePressReleased(event, data)
         redrawAllWrapper(canvas, data)
@@ -335,4 +289,26 @@ def run(width=440, height=510):
     root.mainloop()  # blocks until window is closed
     print("bye!")
 
-run(440, 490)
+run() #640, 710
+
+def testGetPieSlice():
+    print("Testing getPieSlice", end=" ")
+    print(getPieSlice(((3*math.pi)/4), 6))
+    print("Passed!")
+    
+def testGetPolarCoordinates():
+    print("Testing it...", end="")
+    cx=400
+    cy=400
+    n=6
+    x=cx+(((2)**(0.5))/2)
+    y=cy+(((2)**(0.5))/2)
+    print(getPolarCoordinates(cx, cy, n, x, y))
+    print("Passed!")
+    
+'''def drawStartScreen(canvas, data):
+    
+    canvas.create_text'''
+    
+#testGetPieSlice()
+#testGetPolarCoordinates()
