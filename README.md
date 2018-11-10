@@ -7,12 +7,12 @@ import math
 
 
 ####################################
-def getPolarCoordinates(data n, x, y):
+def getPolarCoordinates(data, x, y):
     dx = data.cx - x
     dy = data.cy - y
     deltaTheta = 2 * math.pi / data.n
     r = (dx ** 2 + dy**2) ** 0.5
-    quadrant = getQuadrant(data x, y)
+    quadrant = getQuadrant(data, x, y)
     if dx == 0:
         r = dy
         if quadrant == 1:
