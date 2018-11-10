@@ -46,17 +46,20 @@ def getPieSlice(theta, numSlices):
 # customize these functions
 ####################################
 
+    
 def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
     data.currLine = [] #1D list containing tuples
-    data.YTopMargin=70
-    data.YBottomMargin=20
-    data.XMargin=20
+    data.undoLst = []
+    data.YTopMargin=(70/490)*data.height
+    data.YBottomMargin=(40/490)*data.height
+    data.XMargin=(20/440)*data.width
     data.cx = data.width/2
     data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
-    data.font="bold15"
+    data.fontSize=(15/70)*data.YTopMargin
+    data.font="bold "+str(int(data.fontSize))
     data.maxLimit = 100
     data.limit = 0
     data.mode = "startScreen"
