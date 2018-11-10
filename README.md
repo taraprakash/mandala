@@ -105,7 +105,8 @@ def drawGameScreen(canvas, data):
     canvas.create_line(data.XMargin, data.YTopMargin, data.width-data.XMargin, data.YTopMargin, width=2)
     canvas.create_line(data.XMargin, data.height-data.YBottomMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
-    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
+    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to redo, press \"b\" to restart", font=data.font)
+    
     
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
