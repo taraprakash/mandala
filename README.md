@@ -94,6 +94,28 @@ def keyPressed(event, data):
         elif event.keysym == "r" and len(data.undoLst) > 0:
             data.lines.append(data.undoLst.pop())
     
+ 
+def drawProgress(canvas,data):
+    startX=(data.XMargin*6)
+    barLen=data.width-data.XMargin-startX
+    barThick=data.YBottomMargin//2
+    if data.limit<=100:
+        lim=data.limit
+        done=False
+    else:
+        lim=100
+        done=True
+    progLen=barLen*(lim/100)
+    startY=data.height-((barThick/2)*3)
+    endY=data.height-(barThick/2)
+    canvas.create_rectangle(startX, startY, data.width-data.XMargin, endY, fill="white", width=2)
+    if done:
+        canvas.create_text(data.XMargin*2, startY, text="Done!", anchor=NW, fill="black", font=data.font)
+        canvas.create_rectangle(startX, startY, startX+progLen, endY, fill="gray20")
+    else:
+        canvas.create_text(data.XMargin, startY, text="Progress:", anchor=NW, fill="black", font=data.font)
+        canvas.create_rectangle(startX, startY, startX+progLen, endY, fill="gray47")
+        
 def drawGameScreen(canvas, data):
     for lineLst in data.lines:
         for line in lineLst:
@@ -112,6 +134,7 @@ def drawGameScreen(canvas, data):
     canvas.create_line(data.XMargin, data.height-data.YBottomMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
     canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
+    drawProgress(canvas, data)
     
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
