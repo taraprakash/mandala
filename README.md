@@ -30,6 +30,10 @@ def mousePressed(event, data):
     # use event.x and event.y
     pass
 
+def mousePressReleased(event, data):
+    data.lines.append(data.currLine)
+    data.currLine = []
+
 def keyPressed(event, data):
     # use event.char and event.keysym
     pass
@@ -40,10 +44,6 @@ def redrawAll(canvas, data):
         (x, y)=canvas.data["leftPosn"]
         canvas.create_oval(x-2,y-2,x+2,y+2,fill="blue")
 
-####################################
-# use the run function as-is
-####################################
-
 def run(width=300, height=300):
     def redrawAllWrapper(canvas, data):
         canvas.delete(ALL)
@@ -51,45 +51,13 @@ def run(width=300, height=300):
                                 fill='white', width=0)
         redrawAll(canvas, data)
         canvas.update()    
-    
-    
-    def eventInfo(eventName, x, y, ctrl, shift):
-        # helper function to create a string with the event's info
-        # also, prints the string for debug info
-        msg = ""
-        if ctrl:  msg += "ctrl-"
-        if shift: msg += "shift-"
-        msg += eventName
-        msg += " at " + str((x,y))
-        print(msg)
-        return msg
-    
-    def leftMousePressed(event):
-        #canvas = event.widget.canvas
-        ctrl  = ((event.state & 0x0004) != 0)
-        shift = ((event.state & 0x0001) != 0)    
-        canvas.data["info"] = eventInfo("leftMousePressed", event.x, event.y, ctrl, shift)
-        canvas.data["leftPosn"] = (event.x, event.y)
-        redrawAll(canvas, data)
-        
-    def leftMouseMoved(event):
-        #canvas = event.widget.canvas
-        ctrl  = ((event.state & 0x0004) != 0)
-        shift = ((event.state & 0x0001) != 0)
-        canvas.data["info"] = eventInfo("leftMouseMoved", event.x, event.y, ctrl, shift)
-        canvas.data["leftPosn"] = (event.x, event.y)
-        redrawAll(canvas, data)
 
-    def leftMouseReleased(event):
-        #canvas = event.widget.canvas
-        ctrl  = ((event.state & 0x0004) != 0)
-        shift = ((event.state & 0x0001) != 0)
-        canvas.data["info"] = eventInfo("leftMouseReleased", event.x, event.y, ctrl, shift)
-        canvas.data["leftPosn"] = (200, 100)
-        redrawAll(canvas, data)
-    
     def mousePressedWrapper(event, canvas, data):
         mousePressed(event, data)
+        redrawAllWrapper(canvas, data)
+    
+    def mousePressReleasedWrapper(event, canvas, data):
+        mousePressReleased(event, data)
         redrawAllWrapper(canvas, data)
 
     def keyPressedWrapper(event, canvas, data):
@@ -108,18 +76,16 @@ def run(width=300, height=300):
     canvas = Canvas(root, width=data.width, height=data.height)
     canvas.configure(bd=0, highlightthickness=0)
     canvas.pack()
-    canvas.data = { }
     # set up events
-    #root.bind("<Button-1>", lambda event:
-     #                       mousePressedWrapper(event, canvas, data))
+    root.bind("<B1-Motion>", lambda event: #changed; tracks held-down motion
+                            mousePressedWrapper(event, canvas, data))
+    root.bind("<B1-ButtonRelease>", lambda event: 
+                            mousePressReleasedWrapper(event, canvas, data))
     root.bind("<Key>", lambda event:
                             keyPressedWrapper(event, canvas, data))
-    root.bind("<Button-1>", leftMousePressed)
-    canvas.bind("<B1-Motion>", leftMouseMoved)
-    root.bind("<B1-ButtonRelease>", leftMouseReleased)
     redrawAll(canvas, data)
     # and launch the app
     root.mainloop()  # blocks until window is closed
     print("bye!")
 
-run(400, 200)
+run(400, 400)
