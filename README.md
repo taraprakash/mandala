@@ -49,6 +49,7 @@ def init(data):
     data.numSlices = 6 #number of pie slices
     data.maxLimit = 100
     data.limit = 0
+    data.mode == "startScreen"
 
 def mousePressed(event, data):
     # use event.x and event.y
@@ -67,9 +68,12 @@ def mousePressReleased(event, data):
 
 def keyPressed(event, data):
     # use event.char and event.keysym
-    pass
+    if data.mode == "startScreen" and event.keysym == "s":
+        data.mode = "gameScreen"
+    elif data.mode == "gameScreen" and event.keysym == "r":
+        init(data)
 
-def redrawAll(canvas, data):
+def drawGameScreen(canvas, data):
     # draw in canvas
     for lineLst in data.lines:
         for line in lineLst:
@@ -78,6 +82,15 @@ def redrawAll(canvas, data):
         tempLineLst = convertCurrLine(data)
         for line in tempLineLst:
             canvas.create_line(line, smooth="true")
+
+def drawStartScreen(canvas, data):
+    pass
+
+def redrawAll(canvas, data):
+    if data.mode == "gameScreen":
+        drawGameScreen(canvas, data)
+    elif data.mode == "startScreen":
+        drawStartScreen(canvas, data)
 
 #commits the current line to the entire data.lines 3d list
 def commitCurrLine(data):
