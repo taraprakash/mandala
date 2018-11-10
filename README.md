@@ -11,21 +11,15 @@ def getPolarCoordinates(cx, cy, n, x, y):
     dx = cx - x
     dy = cy -y
     deltaTheta = 2 * math.pi / n
+    r = (dx ** 2 + dy**2) ** 0.5
+    angle = math.atan(dy / dx)
     quadrant = getQuadrant(cx, cy, x, y)
-    if dx == 0:
-        r = dy
-        if quadrant == 1:
-            theta = math.pi / 2
-        else:
-            theta = 3 * math.pi / 2
-    else:
-        angle = math.atan(dy / dx)
-        bigTheta = quadrant * math.pi / 2 + angle
-        pieSlice = getPieSlice(bigTheta, n)
-        pieSliceTheta = deltaTheta * pieSlice
-        theta = bigTheta - pieSliceTheta
-        r = (dx ** 2 + dy**2) ** 0.5
+    bigTheta = quadrant * math.pi / 2 + angle
+    pieSlice = getPieSlice(bigTheta, n)
+    pieSliceTheta = deltaTheta * pieSlice
+    theta = bigTheta - pieSliceTheta
     return (r, theta)
+    
 
 def getQuadrant(cx, cy, x, y):
     if x > cx:
@@ -53,11 +47,20 @@ def init(data):
     data.cx = data.width/2
     data.cy = data.height/2
     data.numSlices = 6 #number of pie slices
+    data.maxLimit = 100
+    data.limit = 0
 
 def mousePressed(event, data):
     # use event.x and event.y
-    r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
-    data.currLine.append((r, offset))
+    if data.limit < data.maxLimit:
+        r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
+        data.currLine.append((r, offset))
+        data.limit += 1
+        print(data.limit)
+    elif data.limit != 1000:
+        print("Stop")
+        data.limit = 1000
+        commitCurrLine(data)
 
 def mousePressReleased(event, data):
     commitCurrLine(data)
@@ -70,19 +73,19 @@ def redrawAll(canvas, data):
     # draw in canvas
     for lineLst in data.lines:
         for line in lineLst:
-            canvas.create_line(line, width = 2, smooth="true")
+            canvas.create_line(line, smooth="true")
     if len(data.currLine) >= 2:
         tempLineLst = convertCurrLine(data)
         for line in tempLineLst:
-            canvas.create_line(line, width = 2, smooth="true")
+            canvas.create_line(line, smooth="true")
 
 #commits the current line to the entire data.lines 3d list
 def commitCurrLine(data):
-    #if len(data.currLine) >= 2?
-    dA = 2*math.pi/data.numSlices
-    tempLine = convertCurrLine(data)
-    data.lines.append(tempLine)
-    data.currLine = []
+    if len(data.currLine) >= 2:
+        dA = 2*math.pi/data.numSlices
+        tempLine = convertCurrLine(data)
+        data.lines.append(tempLine)
+        data.currLine = []
 
 #converts current line to six lines with tuple values listing x and y values
 def convertCurrLine(data):
@@ -156,4 +159,4 @@ def run(width=300, height=300):
     root.mainloop()  # blocks until window is closed
     print("bye!")
 
-run(400, 400)
+run(800, 800)
