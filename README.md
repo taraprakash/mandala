@@ -1,59 +1,37 @@
-#import module_manager
-#module_manager.review()
+import module_manager
+module_manager.review()
 
 #from PIL import Image
 
 import math 
 from tkinter import *
-import pyscreenshot as ImageGrab
-from PIL import Image
- 
-'''# fullscreen
-im=ImageGrab.grab()
-im.show()'''
- 
-'''# part of the screen
-im=ImageGrab.grab(bbox=(10,10,500,500))
-im.show()
- 
-# to file
-ImageGrab.grab_to_file('im.png')'''
-    
-def getBitches():
-    print("Nah, bitches be cray")
-
-
+#import pyscreenshot as ImageGrab
+from PIL import Image, ImageGrab
 
 ####################################
 def getPolarCoordinates(cx, cy, n, x, y):
     dx = cx - x
     dy = cy -y
     deltaTheta = 2 * math.pi / n
-    quadrant = getQuadrant(cx, cy, x, y)
     if dx == 0:
         r = dy
-        if quadrant == 1:
+        if dy > 0:
             theta = math.pi / 2
         else:
             theta = 3 * math.pi / 2
     else:
         angle = math.atan(dy / dx)
-        bigTheta = quadrant * math.pi / 2 + angle
+        if dx < 0:
+            bigTheta = math.pi - angle
+        elif angle > 0:
+            bigTheta = angle
+        else: #angle less than zero
+            bigTheta = math.pi*2 + angle
         pieSlice = getPieSlice(bigTheta, n)
         pieSliceTheta = deltaTheta * pieSlice
         theta = bigTheta - pieSliceTheta
         r = (dx ** 2 + dy**2) ** 0.5
     return (r, theta)
-
-def getQuadrant(cx, cy, x, y):
-    if x > cx:
-        if y > cy:
-            return 3
-        return 0
-    else:
-        if y > cy:
-            return 2
-        return 1
 
 def getPieSlice(theta, numSlices):
     dA=2*math.pi/numSlices
@@ -82,32 +60,29 @@ def init(data):
     data.mode = "startScreen"
     data.colors = ["black", "red4", "pale violet red", "sea green", "DeepSkyBlue4"]
     data.currColor = 0
-    
-    
-'''def save(data):
-    data.im.show()
-    ImageGrab.grab_to_file('im.png')'''
 
 def save(data):
-    data.im=ImageGrab.grab(bbox=(data.XMargin,data.YTopMargin,data.width-data.XMargin,data.height-data.YBottomMargin))
+    if __name__ == "__main__":
+        im=ImageGrab.grab(bbox=(data.rootX+data.XMargin,data.rootY+data.YTopMargin,data.rootX+data.width-data.XMargin,data.rootY+data.height-data.YBottomMargin))
+        im.save("mandala.jpg")
 
-def mousePressed(event, data):
-    # use event.x and event.y
-    if data.mode == "gameScreen" and event.x>data.XMargin and event.x<data.width-data.XMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
+def mousePressHeldDown(event, data):
+    if data.mode == "gameScreen" and data.XMargin < event.x>data.XMargin and event.x<data.width-data.XMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
         if data.limit < data.maxLimit:
             r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
             data.currLine.append((r, offset))
             data.limit += 1
-            print(data.limit)
         elif data.limit != 1000:
-            print("Stop")
             data.limit = 1000
             commitCurrLine(data)
 
 def mousePressReleased(event, data):
     if data.mode == "gameScreen":
         commitCurrLine(data)
-        
+
+def mousePressed(event, data):
+    pass
+
 def keyPressed(event, data):
     # use event.char and event.keysym
     if data.mode == "startScreen":
@@ -132,7 +107,6 @@ def keyPressed(event, data):
             data.lines.append(data.undoLst.pop())
         elif event.keysym == "c":
             save(data)
-    
     
 def drawProgress(canvas,data):
     startX=(data.XMargin*6)
@@ -195,10 +169,8 @@ def drawStartScreen(canvas, data):
     blockWidth = barWidth // len(data.colors)
     for i in range(len(data.colors)):
         color = data.colors[i]
-        print(color)
         canvas.create_rectangle(data.cx + blockWidth * i, data.height - 130, 
                             data.cx + blockWidth * (i + 1), data.height - 80, fill = color)
-    print(data.currColor)
     canvas.create_rectangle(data.cx + data.currColor * blockWidth, data.height - 130,
                             data.cx + blockWidth * (data.currColor + 1), data.height - 80, width = 5, fill = None)
     
@@ -257,6 +229,10 @@ def run(width=440, height=510):
         mousePressed(event, data)
         redrawAllWrapper(canvas, data)
 
+    def mousePressHeldDownWrapper(event, canvas, data):
+        mousePressHeldDown(event, data)
+        redrawAllWrapper(canvas, data)
+    
     def mousePressReleasedWrapper(event, canvas, data):
         mousePressReleased(event, data)
         redrawAllWrapper(canvas, data)
@@ -271,16 +247,24 @@ def run(width=440, height=510):
     data.width = width
     data.height = height
     root = Tk()
+    frame = Frame(root)
+    frame.pack()
     root.resizable(width=False, height=False) # prevents resizing window
     init(data)
     # create the root and the canvas
-    canvas = Canvas(root, width=data.width, height=data.height)
+    canvas = Canvas(frame, width=data.width, height=data.height)
     canvas.configure(bd=0, highlightthickness=0)
     canvas.pack()
+    def something():
+        data.rootX = canvas.winfo_rootx()
+        data.rootY = canvas.winfo_rooty()
+    root.after(200, something)
     # set up events
-    root.bind("<B1-Motion>", lambda event: #changed; tracks held-down motion
+    root.bind("<Button-1>", lambda event:
                             mousePressedWrapper(event, canvas, data))
-    root.bind("<B1-ButtonRelease>", lambda event: 
+    root.bind("<B1-Motion>", lambda event: #tracks held-down motion
+                            mousePressHeldDownWrapper(event, canvas, data))
+    root.bind("<B1-ButtonRelease>", lambda event: #mouse click released
                             mousePressReleasedWrapper(event, canvas, data))
     root.bind("<Key>", lambda event:
                             keyPressedWrapper(event, canvas, data))
