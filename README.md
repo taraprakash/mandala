@@ -6,22 +6,16 @@ highLevel
 from tkinter import *
 
 ####################################
-def getPolarCoordinates(data, x, y):
-    cx = data.cx 
-    cy = data.cy
-    n = data.numSlices
+def getPolarCoordinates(cx, cy, n, x, y):
     dx = cx - x
     dy = cy -y
     deltaTheta = 2 * math.pi / n
     r = (dx ** 2 + dy**2) ** 0.5
     angle = math.atan(dy / dx)
-    quadrant = getQuadrant(data, x, y)
-    if quadrant == 0 or quadrant == 2:
-        bigTheta = quadrant * math.pi / 2 + angle
-    else:
-        bigTheta = quadrant * math.pi / 2 - angle
-    pieSlice = getPieSlice(bigTheta, numSlices)
-    pieLineTheta = deltaTheta * pieSlice
+    quadrant = getQuadrant(cx, cy, x, y)
+    bigTheta = quadrant * math.pi / 2 + angle
+    pieSlice = getPieSlice(bigTheta, n)
+    pieSliceTheta = deltaTheta * pieSlice
     theta = bigTheta - pieSliceTheta
     return (r, theta)
     
@@ -37,16 +31,9 @@ def getQuadrant(data, x, y):
         return 1
         
 def getPieSlice(theta, numSlices):
-    dAngle=360/numSlices
-    minDist=361
-    minSlice=-1
-    for i in range(numSlices):
-        angle=dAngle*i
-        distance=angle-theta
-        if distance<minDist:
-            minDist=distance
-            minSlice=i
-    return minSlice
+    dA=2*math.pi/numSlices
+    slice=theta//dA
+    return int(slice)
 
 ####################################
 # customize these functions
