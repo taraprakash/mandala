@@ -77,7 +77,22 @@ def save(data):
     if __name__ == "__main__":
         im=ImageGrab.grab(bbox=(data.rootX+data.XMargin,data.rootY+data.YTopMargin,data.rootX+data.width-data.XMargin,data.rootY+data.height-data.YBottomMargin))
         im.save("mandala.jpg")
-
+        
+def getButtonCoordinates(data, button):
+    buttonHeight = (60/510)*data.height
+    buttonWidth = (100/580)*data.width
+    buttonDistance = (data.height - data.YBottomMargin - data.YTopMargin - 4*buttonHeight)//3
+    startingX = data.width - data.XRightMargin + 20
+    startingY = data.YTopMargin + button * (buttonDistance + buttonHeight)
+    newX = startingX + buttonWidth
+    newY = startingY + buttonHeight
+    return [(startingX, startingY), (newX, newY)]
+    
+def getLabelCoordinates(buttonCoordinates):
+    cx = (buttonCoordinates[0][0] + buttonCoordinates[1][0])//2
+    cy = (buttonCoordinates[0][1] + buttonCoordinates[1][1])//2
+    return (cx, cy)
+  
 def mousePressHeldDown(event, data):
     # use event.x and event.y
     if data.mode == "gameScreen" and event.x>data.XMargin and event.x<data.width-data.XMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
