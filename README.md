@@ -87,7 +87,7 @@ def keyPressed(event, data):
         elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
             data.numSlices = int(event.keysym)
     elif data.mode == "gameScreen":
-        if event.keysym == "s":
+        if event.keysym == "b":
             init(data)
         elif event.keysym == "u" and len(data.lines) > 0:
             data.undoLst.append(data.lines.pop())
