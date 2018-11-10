@@ -5,7 +5,6 @@
 from tkinter import *
 import math
 
-
 ####################################
 def getPolarCoordinates(cx, cy, n, x, y):
     dx = cx - x
@@ -59,7 +58,7 @@ def init(data):
     data.font="bold15"
     data.maxLimit = 100
     data.limit = 0
-    data.mode == "startScreen"
+    data.mode = "startScreen"
 
 def mousePressed(event, data):
     # use event.x and event.y
@@ -80,12 +79,22 @@ def mousePressReleased(event, data):
         
 def keyPressed(event, data):
     # use event.char and event.keysym
-    if data.mode == "startScreen" and event.keysym == "s":
-        data.mode = "gameScreen"
+    if data.mode == "startScreen":
+        if event.keysym == "s":
+            data.mode = "gameScreen"
+        elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
+            data.numSlices = int(event.keysym)
     elif data.mode == "gameScreen" and event.keysym == "r":
         init(data)
     
 def drawGameScreen(canvas, data):
+    for lineLst in data.lines:
+        for line in lineLst:
+            canvas.create_line(line, width = 2, smooth="true")
+    if len(data.currLine) >= 2:
+        tempLineLst = convertCurrLine(data)
+        for line in tempLineLst:
+            canvas.create_line(line, width = 2, smooth="true")
     canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(0,0,data.XMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(data.width-data.XMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
@@ -97,26 +106,15 @@ def drawGameScreen(canvas, data):
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
     canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
     
-    for lineLst in data.lines:
-        for line in lineLst:
-            canvas.create_line(line, width = 2, smooth="true")
-    if len(data.currLine) >= 2:
-        tempLineLst = convertCurrLine(data)
-        for line in tempLineLst:
-            canvas.create_line(line, width = 2, smooth="true")
     
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
-    canvas.create_text(data.cx, data.height//4, text = "Let\'s Make A \n   Mandala!",
-                        font = "Times  50")
-    canvas.create_text(data.width//3, data.cy, text = "Type a number \n between 4 and 8 \n to choose your \n number of slices", font = "Times 15")
-    #canvas.create_oval(2 * data.width//3 - 40, data.cy - 40,
-                       #2 * data.width//3 + 40, data.cy + 40)
-    canvas.create_rectangle(2 * data.width//3 - 20, data.cy - 20, 
-                            2 * data.width//3 + 20, data.cy + 20,
-                            fill = "white")
-    canvas.create_text(2 * data.width//3, data.cy, text = str(data.numSlices), font = "Times 20")
-    canvas.create_text(data.cx, data.height - 100, text = "press s to start!", font = "Times 30")
+    canvas.create_text(data.cx, data.height//3, text = "Let\'s Make A \n Mandala!")
+    canvas.create_text(data.width//3, data.cy, text = "Type a number \n between 4 and 8 \n to choose your \n number of slices")
+    '''canvas.create_rectangle(2 * data.width//3 - 10, data.cy - 10, 
+                            2 * data.width//3 + 10, data.cy + 10,
+                            text = str(data.numSlices))'''
+    canvas.create_text(data.cx, data.height - 20, text = "press s to start!")
     
 def redrawAll(canvas, data):
     # draw in canvas
