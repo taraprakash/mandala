@@ -7,17 +7,24 @@ import math
 
 
 ####################################
-def getPolarCoordinates(cx, cy, n, x, y):
-    dx = cx - x
-    dy = cy -y
-    deltaTheta = 2 * math.pi / n
+def getPolarCoordinates(data n, x, y):
+    dx = data.cx - x
+    dy = data.cy - y
+    deltaTheta = 2 * math.pi / data.n
     r = (dx ** 2 + dy**2) ** 0.5
-    angle = math.atan(dy / dx)
-    quadrant = getQuadrant(cx, cy, x, y)
-    bigTheta = quadrant * math.pi / 2 + angle
-    pieSlice = getPieSlice(bigTheta, n)
-    pieSliceTheta = deltaTheta * pieSlice
-    theta = bigTheta - pieSliceTheta
+    quadrant = getQuadrant(data x, y)
+    if dx == 0:
+        r = dy
+        if quadrant == 1:
+            theta = math.pi / 2
+        else:
+            theta = 3 * math.pi / 2
+    else:
+        angle = math.atan(dy / dx)
+        bigTheta = quadrant * math.pi / 2 + angle
+        pieSlice = getPieSlice(bigTheta, n)
+        pieSliceTheta = deltaTheta * pieSlice
+        theta = bigTheta - pieSliceTheta
     return (r, theta)
     
 
