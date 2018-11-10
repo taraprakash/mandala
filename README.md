@@ -4,7 +4,7 @@
 
 from tkinter import *
 import math
-
+from PIL import Image, ImageGrab
 
 ####################################
 def getPolarCoordinates(cx, cy, n, x, y):
@@ -73,7 +73,12 @@ def init(data):
     data.save = getButtonCoordinates(data, 2)
     data.restart = getButtonCoordinates(data,3)
     
-def mousePressed(event, data):
+def save(data):
+    if __name__ == "__main__":
+        im=ImageGrab.grab(bbox=(data.rootX+data.XMargin,data.rootY+data.YTopMargin,data.rootX+data.width-data.XMargin,data.rootY+data.height-data.YBottomMargin))
+        im.save("mandala.jpg")
+
+def mousePressHeldDown(event, data):
     # use event.x and event.y
     if data.mode == "gameScreen" and event.x>data.XMargin and event.x<data.width-data.XMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
         if data.limit < data.maxLimit:
@@ -108,6 +113,21 @@ def findButton(data, x, y):
         
 def keyPressed(event, data):
     # use event.char and event.keysym
+    if data.mode == "startScreen":
+        if event.keysym == "s":
+            data.mode = "gameScreen"
+        elif event.keysym.isdigit() and 4 <= int(event.keysym) <= 8:
+            data.numSlices = int(event.keysym)
+        elif event.keysym == "Right":
+            data.currColor += 1
+            if data.currColor >= len(data.colors):
+                data.currColor = len(data.colors) - 1
+        elif event.keysym == "Left":
+            data.currColor -= 1
+            if data.currColor < 0:
+                data.currColor = 0
+    elif data.mode == "gameScreendef keyPressed(event, data):
+    # use event.char and event.keysym
     
     #on start screen!
     if data.mode == "startScreen":
@@ -141,6 +161,12 @@ def keyPressed(event, data):
             
     #on game screen!
     elif data.mode == "gameScreen":
+        if event.keysym == "b":
+            init(data)
+        elif event.keysym == "u" and len(data.lines) > 0:
+            data.undoLst.append(data.lines.pop())
+        elif event.keysym == "r" and len(data.undoLst) > 0:
+            data.lines.append(data.undoLst.pop())":
         if event.keysym == "b":
             init(data)
         elif event.keysym == "u" and len(data.lines) > 0:
@@ -321,6 +347,10 @@ def run(width=440, height=510):
     def mousePressedWrapper(event, canvas, data):
         mousePressed(event, data)
         redrawAllWrapper(canvas, data)
+
+    def mousePressHeldDownWrapper(event, canvas, data):
+        mousePressHeldDown(event, data)
+        redrawAllWrapper(canvas, data)
     
     def mousePressReleasedWrapper(event, canvas, data):
         mousePressReleased(event, data)
@@ -336,16 +366,24 @@ def run(width=440, height=510):
     data.width = width
     data.height = height
     root = Tk()
+    frame = Frame(root)
+    frame.pack()
     root.resizable(width=False, height=False) # prevents resizing window
     init(data)
     # create the root and the canvas
-    canvas = Canvas(root, width=data.width, height=data.height)
+    canvas = Canvas(frame, width=data.width, height=data.height)
     canvas.configure(bd=0, highlightthickness=0)
     canvas.pack()
+    def something():
+        data.rootX = canvas.winfo_rootx()
+        data.rootY = canvas.winfo_rooty()
+    root.after(200, something)
     # set up events
-    root.bind("<B1-Motion>", lambda event: #changed; tracks held-down motion
+    root.bind("<Button-1>", lambda event:
                             mousePressedWrapper(event, canvas, data))
-    root.bind("<B1-ButtonRelease>", lambda event: 
+    root.bind("<B1-Motion>", lambda event: #tracks held-down motion
+                            mousePressHeldDownWrapper(event, canvas, data))
+    root.bind("<B1-ButtonRelease>", lambda event: #mouse click released
                             mousePressReleasedWrapper(event, canvas, data))
     root.bind("<Key>", lambda event:
                             keyPressedWrapper(event, canvas, data))
@@ -353,5 +391,3 @@ def run(width=440, height=510):
     # and launch the app
     root.mainloop()  # blocks until window is closed
     print("bye!")
-
-run(440, 490)
