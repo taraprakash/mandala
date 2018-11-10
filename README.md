@@ -65,7 +65,16 @@ def mousePressReleased(event, data):
 def keyPressed(event, data):
     # use event.char and event.keysym
     pass
-
+    
+def drawStartScreen(data, canvas):
+    canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
+    canvas.create_text(data.cx, data.height//3, text = "Let\'s Make A \n Mandala!")
+    canvas.create_text(data.width//3, data.cy, text = "Type a number \n between 4 and 8 \n to choose your \n number of slices")
+    canvas.create_rectangle(2 * data.width//3 - 10, data.cy - 10, 
+                            2 * data.width//3 + 10, data.cy + 10,
+                            text = "data.n")
+    canvas.create_text(data.cx, data.height - 20, text = "press s to start!")
+    
 def redrawAll(canvas, data):
     # draw in canvas
     for lineLst in data.lines:
