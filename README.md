@@ -50,9 +50,13 @@ def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
     data.currLine = [] #1D list containing tuples
+    data.YTopMargin=70
+    data.YBottomMargin=20
+    data.XMargin=20
     data.cx = data.width/2
     data.cy = data.height/2
     data.numSlices = 6 #number of pie slices
+    data.font="bold15"
 
 def mousePressed(event, data):
     # use event.x and event.y
@@ -65,6 +69,18 @@ def mousePressReleased(event, data):
 def keyPressed(event, data):
     # use event.char and event.keysym
     pass
+    
+def drawGameScreen(canvas, data):
+    canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
+    canvas.create_rectangle(0,0,data.XMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
+    canvas.create_rectangle(data.width-data.XMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
+    canvas.create_rectangle(0, data.height-data.YBottomMargin, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
+    canvas.create_line(data.XMargin, data.YTopMargin, data.XMargin, data.height-data.YBottomMargin, width=2)
+    canvas.create_line(data.width-data.XMargin, data.YTopMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
+    canvas.create_line(data.XMargin, data.YTopMargin, data.width-data.XMargin, data.YTopMargin, width=2)
+    canvas.create_line(data.XMargin, data.height-data.YBottomMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
+    canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
+    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
     
 def drawStartScreen(data, canvas):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
