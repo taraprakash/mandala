@@ -68,6 +68,10 @@ def init(data):
     data.backgroundColors = ["white", "black"]
     data.currBackgroundColor = 0
     data.picking = "background" #can either be background or line
+    data.undo = getButtonCoordinates(data, 0)
+    data.redo = getButtonCoordinates(data, 1)
+    data.save = getButtonCoordinates(data, 2)
+    data.restart = getButtonCoordinates(data,3)
     
 def mousePressed(event, data):
     # use event.x and event.y
@@ -85,6 +89,22 @@ def mousePressed(event, data):
 def mousePressReleased(event, data):
     if data.mode == "gameScreen":
         commitCurrLine(data)
+
+def mousePressed(event, data):
+    x = event.x
+    y = event.y
+    button = findButton(data, event.x, event.y)
+    if button != None:
+        if button == "undo":
+            pass
+        
+    
+def findButton(data, x, y):
+    for button in [data.undo, data.redo, data.save, data.restart]:
+        x0, y0, x1, y1 = button
+        if x0 <= x <= x1 and y0 <= y <= y1:
+            return str(button)[5:]
+    return None
         
 def keyPressed(event, data):
     # use event.char and event.keysym
@@ -191,26 +211,25 @@ def drawGameScreen(canvas, data):
     canvas.create_text(data.cx, data.YTopMargin//2, text="Click and drag to draw!", font = data.font)
     drawProgress(canvas, data)
     
-    buttonHeight = 60
-    buttonWidth = 100
-    buttonDistance = (data.height - data.YBottomMargin - data.YTopMargin - 4*buttonHeight)//3
-    startingX = data.width - data.XRightMargin + 20
-    startingY = data.YTopMargin
+    undoCoordinates = getButtonCoordinates(data, 0)
+    undoLabelCoordinates = getLabelCoordinates(undoCoordinates)
+    canvas.create_rectangle(undoCoordinates, width = 2, fill = "alice blue")
+    canvas.create_text(undoLabelCoordinates, text = "undo \nmove", font = "Times 15 bold")
     
-    canvas.create_rectangle(startingX, startingY, startingX + buttonWidth, startingY + buttonHeight, width = 2, fill = "alice blue")
-    canvas.create_text((2*startingX + buttonWidth)// 2, (2*startingY + buttonHeight)//2, text = "undo \nmove", font = "Times 15 bold")
+    redoCoordinates = getButtonCoordinates(data, 1)
+    redoLabelCoordinates = getLabelCoordinates(redoCoordinates)
+    canvas.create_rectangle(redoCoordinates, width = 2, fill = "alice blue")
+    canvas.create_text(redoLabelCoordinates, text = "redo \nmove", font = "Times 15 bold")
     
-    newY = startingY + buttonDistance + buttonHeight
-    canvas.create_rectangle(startingX, newY, startingX + buttonWidth, newY + buttonHeight, width = 2, fill = "alice blue")
-    canvas.create_text((2 * startingX + buttonWidth)//2, (2*newY + buttonHeight)//2, text = "redo \nmove", font = "Times 15 bold")
+    saveImageCoordinates = getButtonCoordinates(data, 2)
+    saveImageLabelCoordinates = getLabelCoordinates(saveImageCoordinates)
+    canvas.create_rectangle(saveImageCoordinates, width = 2, fill = "alice blue")
+    canvas.create_text(saveImageLabelCoordinates, text = "save \nimage", font = "Times 15 bold")
     
-    newY = newY + buttonDistance + buttonHeight
-    canvas.create_rectangle(startingX, newY, startingX + buttonWidth, newY + buttonHeight, width = 2, fill = "alice blue")
-    canvas.create_text((2 * startingX + buttonWidth)//2, (2*newY + buttonHeight)//2, text = "restart", font = "Times 15 bold")
-    
-    newY = newY + buttonDistance + buttonHeight
-    canvas.create_rectangle(startingX, newY, startingX + buttonWidth, newY + buttonHeight, width = 2, fill = "alice blue")
-    canvas.create_text((2 * startingX + buttonWidth)//2, (2*newY + buttonHeight)//2, text = "save \nimage", font = "Times 15 bold")
+    restartCoordinates = getButtonCoordinates(data, 3)
+    restartLabelCoordinates = getLabelCoordinates(restartCoordinates)
+    canvas.create_rectangle(restartCoordinates, width = 2, fill = "alice blue")
+    canvas.create_text(restartLabelCoordinates, text = "restart", font = "Times 15 bold")
     
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
@@ -258,6 +277,7 @@ def drawStartScreen(canvas, data):
         lineFont = "Times 15 bold underline"
     canvas.create_text(data.width//4, data.height - 130, text = "background:", font = backgroundFont)
     canvas.create_text(data.width//4, data.height - 85, text = "lines:", font = lineFont)
+                           
     
 def redrawAll(canvas, data):
     # draw in canvas
