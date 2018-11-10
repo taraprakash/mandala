@@ -46,29 +46,29 @@ def getPieSlice(theta, numSlices):
 # customize these functions
 ####################################
 
-    
 def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
     data.currLine = [] #1D list containing tuples
     data.undoLst = []
-    data.YTopMargin=(70/490)*data.height
+    data.YTopMargin=(40/490)*data.height
     data.YBottomMargin=(40/490)*data.height
-    data.XMargin=(20/440)*data.width
-    data.cx = data.width/2
+    data.XLeftMargin=(20/440)*data.width
+    data.XRightMargin = 130
+    data.cx = (data.width - data.XLeftMargin - data.XRightMargin)/2 + data.XLeftMargin
     data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
-    data.fontSize=(15/70)*data.YTopMargin
-    data.font="bold "+str(int(data.fontSize))
+    data.fontSize=(15/40)*data.YTopMargin
+    data.font="Times "+str(int(data.fontSize)) + " bold"
     data.maxLimit = 100
     data.limit = 0
     data.mode = "startScreen"
-    data.colors = ["black", "red4", "pale violet red", "sea green", "DeepSkyBlue4"]
+    data.colors = ["black", "red4", "pale violet red", "sea green", "DeepSkyBlue4", "white"]
     data.currColor = 0
     data.backgroundColors = ["white", "black"]
     data.currBackgroundColor = 0
     data.picking = "background" #can either be background or line
-
+    
 def mousePressed(event, data):
     # use event.x and event.y
     if data.mode == "gameScreen" and event.x>data.XMargin and event.x<data.width-data.XMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
@@ -181,20 +181,40 @@ def drawGameScreen(canvas, data):
         for line in tempLineLst:
             canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
     canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
-    canvas.create_rectangle(0,0,data.XMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
-    canvas.create_rectangle(data.width-data.XMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
+    canvas.create_rectangle(0,0,data.XLeftMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
+    canvas.create_rectangle(data.width-data.XRightMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(0, data.height-data.YBottomMargin, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
-    canvas.create_line(data.XMargin, data.YTopMargin, data.XMargin, data.height-data.YBottomMargin, width=2)
-    canvas.create_line(data.width-data.XMargin, data.YTopMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
-    canvas.create_line(data.XMargin, data.YTopMargin, data.width-data.XMargin, data.YTopMargin, width=2)
-    canvas.create_line(data.XMargin, data.height-data.YBottomMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
-    canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
-    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to redo, press \"b\" to restart", font=data.font)
+    canvas.create_line(data.XLeftMargin, data.YTopMargin, data.XLeftMargin, data.height-data.YBottomMargin, width=2)
+    canvas.create_line(data.width-data.XRightMargin, data.YTopMargin, data.width-data.XRightMargin, data.height-data.YBottomMargin, width=2)
+    canvas.create_line(data.XLeftMargin, data.YTopMargin, data.width-data.XRightMargin, data.YTopMargin, width=2)
+    canvas.create_line(data.XLeftMargin, data.height-data.YBottomMargin, data.width-data.XRightMargin, data.height-data.YBottomMargin, width=2)
+    canvas.create_text(data.cx, data.YTopMargin//2, text="Click and drag to draw!", font = data.font)
     drawProgress(canvas, data)
+    
+    buttonHeight = 60
+    buttonWidth = 100
+    buttonDistance = (data.height - data.YBottomMargin - data.YTopMargin - 4*buttonHeight)//3
+    startingX = data.width - data.XRightMargin + 20
+    startingY = data.YTopMargin
+    
+    canvas.create_rectangle(startingX, startingY, startingX + buttonWidth, startingY + buttonHeight, width = 2, fill = "alice blue")
+    canvas.create_text((2*startingX + buttonWidth)// 2, (2*startingY + buttonHeight)//2, text = "undo \nmove", font = "Times 15 bold")
+    
+    newY = startingY + buttonDistance + buttonHeight
+    canvas.create_rectangle(startingX, newY, startingX + buttonWidth, newY + buttonHeight, width = 2, fill = "alice blue")
+    canvas.create_text((2 * startingX + buttonWidth)//2, (2*newY + buttonHeight)//2, text = "redo \nmove", font = "Times 15 bold")
+    
+    newY = newY + buttonDistance + buttonHeight
+    canvas.create_rectangle(startingX, newY, startingX + buttonWidth, newY + buttonHeight, width = 2, fill = "alice blue")
+    canvas.create_text((2 * startingX + buttonWidth)//2, (2*newY + buttonHeight)//2, text = "restart", font = "Times 15 bold")
+    
+    newY = newY + buttonDistance + buttonHeight
+    canvas.create_rectangle(startingX, newY, startingX + buttonWidth, newY + buttonHeight, width = 2, fill = "alice blue")
+    canvas.create_text((2 * startingX + buttonWidth)//2, (2*newY + buttonHeight)//2, text = "save \nimage", font = "Times 15 bold")
     
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
-    canvas.create_text(data.cx, data.height//4, text = "Let\'s Make A \n   Mandala!",
+    canvas.create_text(data.width//2, data.height//5, text = "Let\'s Make A \n   Mandala!",
                         font = "Times  50")
     canvas.create_text(data.width//3, data.cy, text = "Type a number \n between 4 and 8 \n to choose your \n number of slices", font = "Times 15")
     #canvas.create_oval(2 * data.width//3 - 40, data.cy - 40,
@@ -203,8 +223,8 @@ def drawStartScreen(canvas, data):
                             2 * data.width//3 + 20, data.cy + 20,
                             fill = "white")
     canvas.create_text(2 * data.width//3, data.cy, text = str(data.numSlices), font = "Times 20")
-    canvas.create_text(data.cx, data.height - 30, text = "Press s to start!", font = "Times 20")
-    canvas.create_text(data.width//4 + 20, data.height - 160, text = "Use arrow keys to pick colors", font = "Times 15")
+    canvas.create_text(data.width//2, data.height - 30, text = "Press s to start!", font = "Times 20")
+    canvas.create_text(data.width//2, data.height - 180, text = "Use arrow keys to pick colors", font = "Times 15")
     
     #picking line color
     lineBarWidth = 200
