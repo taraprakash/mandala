@@ -57,18 +57,33 @@ def init(data):
     data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
     data.font="bold15"
+    data.maxLimit = 100
+    data.limit = 0
+    data.mode == "startScreen"
 
 def mousePressed(event, data):
     # use event.x and event.y
-    r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
-    data.currLine.append((r, offset))
+    if data.mode == "gameScreen":
+        if data.limit < data.maxLimit:
+            r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
+            data.currLine.append((r, offset))
+            data.limit += 1
+            print(data.limit)
+        elif data.limit != 1000:
+            print("Stop")
+            data.limit = 1000
+            commitCurrLine(data)
 
 def mousePressReleased(event, data):
-    commitCurrLine(data)
-
+    if data.mode == "gameScreen":
+        commitCurrLine(data)
+        
 def keyPressed(event, data):
     # use event.char and event.keysym
-    pass
+    if data.mode == "startScreen" and event.keysym == "s":
+        data.mode = "gameScreen"
+    elif data.mode == "gameScreen" and event.keysym == "r":
+        init(data)
     
 def drawGameScreen(canvas, data):
     canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
@@ -82,6 +97,14 @@ def drawGameScreen(canvas, data):
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
     canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
     
+    for lineLst in data.lines:
+        for line in lineLst:
+            canvas.create_line(line, width = 2, smooth="true")
+    if len(data.currLine) >= 2:
+        tempLineLst = convertCurrLine(data)
+        for line in tempLineLst:
+            canvas.create_line(line, width = 2, smooth="true")
+    
 def drawStartScreen(data, canvas):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
     canvas.create_text(data.cx, data.height//3, text = "Let\'s Make A \n Mandala!")
@@ -93,14 +116,10 @@ def drawStartScreen(data, canvas):
     
 def redrawAll(canvas, data):
     # draw in canvas
-    for lineLst in data.lines:
-        for line in lineLst:
-            canvas.create_line(line, width = 2, smooth="true")
-    if len(data.currLine) >= 2:
-        tempLineLst = convertCurrLine(data)
-        for line in tempLineLst:
-            canvas.create_line(line, width = 2, smooth="true")
-    drawGameScreen(canvas, data)
+    if data.mode == "gameScreen":
+        drawGameScreen(canvas, data)
+    elif data.mode == "startScreen":
+        drawStartScreen(canvas, data)
 
 #commits the current line to the entire data.lines 3d list
 def commitCurrLine(data):
