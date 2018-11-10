@@ -46,20 +46,17 @@ def getPieSlice(theta, numSlices):
 # customize these functions
 ####################################
 
-    
 def init(data):
     # load data.xyz as appropriate
     data.lines = [] #eventual 3D list containing all the lines (lists of lineLsts of lines of tuples)
     data.currLine = [] #1D list containing tuples
-    data.undoLst = []
-    data.YTopMargin=(70/490)*data.height
-    data.YBottomMargin=(40/490)*data.height
-    data.XMargin=(20/440)*data.width
+    data.YTopMargin=70
+    data.YBottomMargin=20
+    data.XMargin=20
     data.cx = data.width/2
     data.cy = (data.height+data.YTopMargin-data.YBottomMargin)/2
     data.numSlices = 6 #number of pie slices
-    data.fontSize=(15/70)*data.YTopMargin
-    data.font="bold "+str(int(data.fontSize))
+    data.font="bold15"
     data.maxLimit = 100
     data.limit = 0
     data.mode = "startScreen"
@@ -106,7 +103,6 @@ def keyPressed(event, data):
         elif event.keysym == "r" and len(data.undoLst) > 0:
             data.lines.append(data.undoLst.pop())
     
- 
 def drawProgress(canvas,data):
     startX=(data.XMargin*6)
     barLen=data.width-data.XMargin-startX
@@ -131,11 +127,11 @@ def drawProgress(canvas,data):
 def drawGameScreen(canvas, data):
     for lineLst in data.lines:
         for line in lineLst:
-            canvas.create_line(line, width = 2, smooth="true")
+            canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
     if len(data.currLine) >= 2:
         tempLineLst = convertCurrLine(data)
         for line in tempLineLst:
-            canvas.create_line(line, width = 2, smooth="true")
+            canvas.create_line(line, width = 2, smooth="true", fill = data.colors[data.currColor])
     canvas.create_rectangle(0,0,data.width, data.YTopMargin, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(0,0,data.XMargin, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
     canvas.create_rectangle(data.width-data.XMargin, 0, data.width, data.height, fill="lightSteelBlue", outline="lightSteelBlue")
@@ -145,8 +141,9 @@ def drawGameScreen(canvas, data):
     canvas.create_line(data.XMargin, data.YTopMargin, data.width-data.XMargin, data.YTopMargin, width=2)
     canvas.create_line(data.XMargin, data.height-data.YBottomMargin, data.width-data.XMargin, data.height-data.YBottomMargin, width=2)
     canvas.create_text(data.width//2, data.YTopMargin//4, text="Click and drag to draw, press \"u\" to undo", font=data.font)
-    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to redo, press \"b\" to restart", font=data.font)
+    canvas.create_text(data.width//2, data.YTopMargin*3//4, text="press \"r\" to restart", font=data.font)
     drawProgress(canvas, data)
+    
     
 def drawStartScreen(canvas, data):
     canvas.create_rectangle(0, 0, data.width, data.height, fill = "lightSteelBlue")
@@ -181,12 +178,6 @@ def redrawAll(canvas, data):
         drawGameScreen(canvas, data)
     elif data.mode == "startScreen":
         drawStartScreen(canvas, data)
-def redrawAll(canvas, data):
-    # draw in canvas
-    if data.mode == "gameScreen":
-        drawGameScreen(canvas, data)
-    elif data.mode == "startScreen":
-        drawStartScreen(canvas, data)
 
 #commits the current line to the entire data.lines 3d list
 def commitCurrLine(data):
@@ -195,8 +186,6 @@ def commitCurrLine(data):
         tempLine = convertCurrLine(data)
         data.lines.append(tempLine)
         data.currLine = []
-    if len(data.undoLst) != 0:
-        data.undoLst = []
 
 #converts current line to six lines with tuple values listing x and y values
 def convertCurrLine(data):
@@ -217,7 +206,6 @@ def convertCurrLine(data):
         tempLine.append(line2)
     return tempLine #2D list of lists of tuples with points of a line
 
-#converts polar coordinates to cartesian
 def convertToCartesian(cx, cy, r, theta):
     x = cx + r*math.cos(theta)
     y = cy - r*math.sin(theta)
@@ -271,4 +259,4 @@ def run(width=440, height=510):
     root.mainloop()  # blocks until window is closed
     print("bye!")
 
-run(440, 490)
+run()
