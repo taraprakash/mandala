@@ -68,7 +68,7 @@ def init(data):
 
 def mousePressed(event, data):
     # use event.x and event.y
-    if data.mode == "gameScreen":
+    if data.mode == "gameScreen" and event.x>data.XMargin and event.x<data.width-data.XMargin and event.y>data.YTopMargin and event.y<data.height-data.YBottomMargin:
         if data.limit < data.maxLimit:
             r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
             data.currLine.append((r, offset))
