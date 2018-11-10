@@ -53,9 +53,45 @@ def keyPressed(event, data):
 
 def redrawAll(canvas, data):
     # draw in canvas
-    if "leftPosn" in canvas.data:
-        (x, y)=canvas.data["leftPosn"]
-        canvas.create_oval(x-2,y-2,x+2,y+2,fill="blue")
+    for lineLst in data.lines:
+        for line in lineLst:
+            canvas.create_line(line, smooth="true")
+    if len(data.currLine) >= 2:
+        tempLineLst = convertCurrLine(data.currLine, data.numSlices)
+        for line in tempLineLst:
+            canvas.create_line(line, smooth="true")
+
+#commits the current line to the entire data.lines 3d list
+def commitCurrLine(data):
+    #if len(data.currLine) >= 2?
+    dA = 2*math.pi/data.numSlices
+    tempLine = convertCurrLine(data.currLine, data.numSlices)
+    data.lines.append(tempLine)
+    data.currLine = []
+
+#converts current line to six lines with tuple values listing x and y values
+def convertCurrLine(data):
+    #if len(data.currLine) >= 2?
+    dA = 2*math.pi/data.numSlices
+    tempLine = []
+    for currSlice in range(data.numSlices):
+        sliceAngle = data.currSlice*dA
+        line1 = []
+        line2 = []
+        for tup in line:
+            r, offset = tup
+            x1, y1 = convertToCartesian(data.cx, data.cy, r, sliceAngle + offset)
+            line1.append(x1, y1)
+            x2, y2 = convertToCartesian(data.cx, data.cy, r, sliceAngle - offset)
+            line2.append(x2, y2)
+        tempLine.append(line1)
+        tempLine.append(line2)
+    return tempLine #2D list of lists of tuples with points of a line
+
+def convertToCartesian(cx, cy, r, theta):
+    x = cx + r*math.cos(theta)
+    y = cy - r*math.sin(theta)
+    return (x, y)
 
 ####################################
 # use the run function as-is
