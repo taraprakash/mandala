@@ -8,9 +8,9 @@ from PIL import Image, ImageGrab
 
 ####################################
 def getPolarCoordinates(cx, cy, n, x, y):
-    dx = cx - x
-    dy = cy -y
-    deltaTheta = 2 * math.pi / n
+    dx = x - cx
+    dy = y - cy
+    dA = 2 * math.pi / n
     if dx == 0:
         r = dy
         if dy > 0:
@@ -26,7 +26,7 @@ def getPolarCoordinates(cx, cy, n, x, y):
         else: #angle less than zero
             bigTheta = math.pi*2 + angle
         pieSlice = getPieSlice(bigTheta, n)
-        pieSliceTheta = deltaTheta * pieSlice
+        pieSliceTheta = dA * pieSlice
         theta = bigTheta - pieSliceTheta
         r = (dx ** 2 + dy**2) ** 0.5
     return (r, theta)
