@@ -94,9 +94,7 @@ def mousePressHeldDown(event, data):
             r, offset = getPolarCoordinates(data.cx, data.cy, data.numSlices, event.x, event.y)
             data.currLine.append((r, offset))
             data.limit += 1
-            print(data.limit)
         elif data.limit != 1000:
-            print("Stop")
             data.limit = 1000
             commitCurrLine(data)
 
@@ -109,12 +107,10 @@ def mousePressed(event, data):
         x = event.x
         y = event.y
         button = findButton(data, event.x, event.y)
-        print(button)
         if button != None:
             if button == "undo" and len(data.lines) > 0:
                 data.undoLst.append(data.lines.pop())
             elif button == "redo" and len(data.undoLst) > 0:
-                print("hi")
                 data.lines.append(data.undoLst.pop())
             elif button == "save":
                 save(data)
@@ -152,7 +148,6 @@ def keyPressed(event, data):
                 data.currBackgroundColor += 1
                 if data.currBackgroundColor >= len(data.backgroundColors):
                     data.currBackgroundColor = len(data.backgroundColors) - 1
-                print(data.currBackgroundColor)
         else:
             if event.keysym == "Up":
                 data.picking = "background"
@@ -370,7 +365,6 @@ def run(width=580, height=510):
     def something():
         data.rootX = canvas.winfo_rootx()
         data.rootY = canvas.winfo_rooty()
-        print(data.rootX, data.rootY)
     root.after(200, something)
     # set up events
     root.bind("<Button-1>", lambda event:
